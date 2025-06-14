@@ -3,6 +3,7 @@
 @section('title', 'Welcome')
 
 @section('content')
+<div class="container py-5">
     <div class="card">
 
         <div class="card-header text-center">
@@ -38,4 +39,5 @@
         </div>
 
     </div>
+</div>
 @endsection

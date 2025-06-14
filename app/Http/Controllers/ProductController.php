@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
@@ -12,7 +13,13 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::paginate(10);
+        $page = request('page', 1);
+        $cacheKey = "products_page_$page";
+
+        $products = Cache::remember($cacheKey, 3600, function () {
+            return Product::paginate(3);
+        });
+
         return view('pages.products.index', compact('products'));
     }
 
@@ -44,6 +51,9 @@ class ProductController extends Controller
         }
 
         Product::create($data);
+
+        $this->clearProductCache();
+
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
     }
 
@@ -88,6 +98,9 @@ class ProductController extends Controller
         }
 
         $product->update($data);
+
+        $this->clearProductCache();
+
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
 
     }
@@ -98,11 +111,22 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+
+        $this->clearProductCache();
+        $this->clearTrashCache();
+
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
     }
 
     public function trash(){
-        $products = Product::onlyTrashed()->paginate(10);
+
+        $page = request('page', 1);
+        $cacheKey = "trash_page_$page";
+
+        $products = Cache::remember($cacheKey, 3600, function () {
+            return Product::onlyTrashed()->paginate(3);
+        });
+
         return view('pages.products.trash', compact('products'));
     }
 
@@ -110,6 +134,10 @@ class ProductController extends Controller
     {
         $product = Product::withTrashed()->findOrFail($id);
         $product->restore();
+
+        $this->clearProductCache();
+        $this->clearTrashCache();
+
         return redirect()->route('products.index')->with('success', 'Product restored successfully.');
     }
 
@@ -120,7 +148,28 @@ class ProductController extends Controller
             \Storage::disk('public')->delete($product->image);
         }
         $product->forceDelete();
+
+        $this->clearTrashCache();
+
         return redirect()->route('products.index')->with('success', 'Product permanently deleted successfully.');
+    }
+
+    private function clearProductCache()
+    {
+        $total = Product::count();
+        $lastPage = ceil($total / 3);
+
+        Cache::forget("products_page_1");
+        Cache::forget("products_page_{$lastPage}");
+    }
+
+    private function clearTrashCache()
+    {
+        $total = Product::onlyTrashed()->count();
+        $lastPage = ceil($total / 3);
+
+        Cache::forget("trash_page_1");
+        Cache::forget("trash_page_{$lastPage}");
     }
 
 }

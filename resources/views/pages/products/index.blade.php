@@ -28,7 +28,8 @@
             @endif
         </x-slot>
 
-        <table class="table table-striped">
+        <div class="table-responsive">
+            <table class="table table-striped">
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -81,7 +82,8 @@
                     </tr>
                 @endif
             </tbody>
-          </table>
+            </table>
+        </div>
 
           {{ $products->links() }}
 

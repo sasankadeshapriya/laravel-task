@@ -10,9 +10,8 @@
 
     @include('partials.navbar')
 
-    <div class="container py-5">
-        @yield('content')
-    </div>
+
+    @yield('content')
 
     @include('partials.footer')
 
