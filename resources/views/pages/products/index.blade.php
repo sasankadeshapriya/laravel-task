@@ -60,16 +60,16 @@
                     <td>{{ $product->stock }}</td>
                     <td>{{ $product->color }}</td>
                     <td>
-                        <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-primary">
+                        <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-primary mb-1">
                             View
                         </a>
-                        <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-primary">
+                        <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-primary mb-1">
                             Edit
                         </a>
                         <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-sm btn-danger mb-1">Delete</button>
                         </form>
                     </td>
                 </tr>
